@@ -10,8 +10,6 @@
  * Description = Navigates a linked list and notifies a listener when a node is visited.
  *****************************************************************************/
 
-using System.ComponentModel;
-
 namespace ObserverPatternDemo
 {
     /// <summary>
