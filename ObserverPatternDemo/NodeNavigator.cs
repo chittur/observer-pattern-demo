@@ -51,7 +51,7 @@ namespace ObserverPatternDemo
             while (node != null)
             {
                 // Notify the listener when a node is visited.
-               _listener ?.OnNodeVisited(node.Value);
+                _listener?.OnNodeVisited(node.Value);
                 node = node.Next;
             }
         }
