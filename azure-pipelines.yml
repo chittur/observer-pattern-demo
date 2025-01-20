@@ -2,7 +2,9 @@ trigger:
 - main
 
 pool:
-  vmImage: 'windows-latest'
+  Name: RamAgentPool
+  demands:
+  - Agent.Name -equals RamAgent
 
 steps:
 - task: UseDotNet@2
