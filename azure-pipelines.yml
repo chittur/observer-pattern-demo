@@ -9,23 +9,27 @@ variables:
 
 steps:
 - task: UseDotNet@2
+  displayName: 'Install .NET Core SDK 6.0'
   inputs:
     packageType: 'sdk'
     version: '6.x'
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
 - task: DotNetCoreCLI@2
+  displayName: 'Restore NuGet Packages'
   inputs:
     command: 'restore'
     projects: '**/*.csproj'
 
 - task: DotNetCoreCLI@2
+  displayName: 'Build Project'
   inputs:
     command: 'build'
     projects: '**/*.csproj'
     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
+  displayName: 'Run Unit Tests'
   inputs:
     command: 'test'
     projects: '**/*Tests/*.csproj'
