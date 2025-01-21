@@ -29,18 +29,17 @@ steps:
     arguments: '--configuration $(buildConfiguration)'
 
 - script: |
-    if ! dotnet tool list -g | grep -q dotnet-format; then
+    export PATH="$PATH:/home/vsts/.dotnet/tools"
+    if dotnet tool list -g | grep -q dotnet-format; then
+      echo 'dotnet-format already installed'
+    else
       dotnet tool install -g dotnet-format
     fi
-  displayName: 'Install dotnet-format if not installed'
+  displayName: 'Ensure dotnet-format is installed'
 
-- task: DotNetCoreCLI@2
+- script: |
+    /home/vsts/.dotnet/tools/dotnet-format --verify-no-changes
   displayName: 'Run .editorconfig checks'
-  inputs:
-    command: 'custom'
-    custom: 'format'
-    arguments: '--verify-no-changes'
-    workingDirectory: '$(AGENT_TEMPDIRECTORY)/.dotnet/tools/dotnet-format'
   continueOnError: false # This will fail the pipeline if there are any formatting issues
 
 - task: DotNetCoreCLI@2
