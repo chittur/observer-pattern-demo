@@ -19,7 +19,7 @@ steps:
   displayName: 'Restore NuGet Packages'
   inputs:
     command: 'restore'
-    projects: '**/*.sln'
+    projects: '**/*.csproj'
 
 - task: DotNetCoreCLI@2
   displayName: 'Build Solution'
