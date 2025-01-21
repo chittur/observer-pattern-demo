@@ -45,5 +45,5 @@ steps:
   displayName: 'Run Unit Tests'
   inputs:
     command: 'test'
-    projects: '**/*Tests/*.sln'
+    projects: '**/*Tests/*.csproj'
     arguments: '--configuration $(buildConfiguration) --no-build'
