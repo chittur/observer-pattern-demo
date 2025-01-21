@@ -19,26 +19,25 @@ steps:
   displayName: 'Restore NuGet Packages'
   inputs:
     command: 'restore'
-    projects: '**/*.csproj'
+    projects: '**/*.sln'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Build Project'
+  displayName: 'Build Solution'
   inputs:
     command: 'build'
-    projects: '**/*.csproj'
+    projects: '**/*.sln'
     arguments: '--configuration $(buildConfiguration)'
 
-- script: |
-    export PATH="$PATH:/home/vsts/.dotnet/tools"
-    if dotnet tool list -g | grep -q dotnet-format; then
-      echo 'dotnet-format already installed'
-    else
+- powershell: |
+    $dotnetFormat = dotnet tool list -g | Select-String 'dotnet-format'
+    if (-not $dotnetFormat) {
       dotnet tool install -g dotnet-format
-    fi
-  displayName: 'Ensure dotnet-format is installed'
+    }
+    $env:PATH += ';' + [System.Environment]::GetFolderPath('UserProfile') + '\.dotnet\tools'
+  displayName: 'Ensure dotnet-format is installed and add to PATH'
 
-- script: |
-    /home/vsts/.dotnet/tools/dotnet-format --verify-no-changes
+- powershell: |
+    dotnet format --verify-no-changes
   displayName: 'Run .editorconfig checks'
   continueOnError: false # This will fail the pipeline if there are any formatting issues
 
@@ -46,5 +45,5 @@ steps:
   displayName: 'Run Unit Tests'
   inputs:
     command: 'test'
-    projects: '**/*Tests/*.csproj'
+    projects: '**/*Tests/*.sln'
     arguments: '--configuration $(buildConfiguration) --no-build'
