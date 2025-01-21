@@ -29,6 +29,7 @@ steps:
     arguments: '--configuration $(buildConfiguration)'
 
 - powershell: |
+    Import-Module Microsoft.PowerShell.Security
     Remove-Module -Name * -ListAvailable | Remove-Module -Force
   displayName: 'Clear PowerShell Module Cache'
 
