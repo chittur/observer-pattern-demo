@@ -28,23 +28,11 @@ steps:
     projects: '**/*.csproj'
     arguments: '--configuration $(buildConfiguration)'
 
-- powershell: |
-    Import-Module Microsoft.PowerShell.Security
-    Remove-Module -Name * -ListAvailable | Remove-Module -Force
-  displayName: 'Clear PowerShell Module Cache'
-
 - script: |
-    if dotnet tool list -g | grep -q dotnet-format; then
-      dotnet tool uninstall -g dotnet-format
+    if ! dotnet tool list -g | grep -q dotnet-format; then
+      dotnet tool install -g dotnet-format
     fi
-  displayName: 'Uninstall existing dotnet-format if installed'
-
-- task: DotNetCoreCLI@2
-  displayName: 'Install dotnet-format'
-  inputs:
-    command: 'custom'
-    custom: 'tool'
-    arguments: 'install -g dotnet-format'
+  displayName: 'Install dotnet-format if not installed'
 
 - task: DotNetCoreCLI@2
   displayName: 'Run .editorconfig checks'
@@ -52,7 +40,7 @@ steps:
     command: 'custom'
     custom: 'format'
     arguments: '--verify-no-changes'
-    workingDirectory: '$(Agent.ToolsDirectory)/dotnet-tools/.store/dotnet-format/*/dotnet-format/*/tools/net6.0/any/'
+    workingDirectory: '$(AGENT_TEMPDIRECTORY)/.dotnet/tools/dotnet-format'
   continueOnError: false # This will fail the pipeline if there are any formatting issues
 
 - task: DotNetCoreCLI@2
