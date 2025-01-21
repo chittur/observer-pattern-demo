@@ -28,6 +28,10 @@ steps:
     projects: '**/*.csproj'
     arguments: '--configuration $(buildConfiguration)'
 
+- powershell: |
+    Remove-Module -Name * -ListAvailable | Remove-Module -Force
+  displayName: 'Clear PowerShell Module Cache'
+
 - script: |
     if dotnet tool list -g | grep -q dotnet-format; then
       dotnet tool uninstall -g dotnet-format
