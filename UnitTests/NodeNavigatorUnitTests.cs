@@ -11,6 +11,7 @@
  *****************************************************************************/
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Logging;
 using ObserverPatternDemo;
 
 namespace UnitTests
@@ -55,6 +56,7 @@ namespace UnitTests
         [TestMethod]
         public void TestNavigationCallbacks()
         {
+            Logger.LogMessage("Running TestNavigationCallbacks");
             NodeListener listener = new();
             int[] numbers = { 1, 2, 3, 4, 5 };
             NodeNavigator navigator = new(numbers);
@@ -70,6 +72,7 @@ namespace UnitTests
         [TestMethod]
         public void TestEmptyNavigationHasNoCallback()
         {
+            Logger.LogMessage("Running TestEmptyNavigationHasNoCallback");
             NodeListener listener = new();
             int[] numbers = { };
             NodeNavigator navigator = new(numbers);

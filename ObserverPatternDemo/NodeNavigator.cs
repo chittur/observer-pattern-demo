@@ -17,8 +17,8 @@ namespace ObserverPatternDemo
     /// </summary>
     public class NodeNavigator
     {
-        private readonly LinkedList<int> _list;     // The linked list to navigate.
-        private INodeNavigationListener? _listener; // The listener to notify when a node is visited.
+        private readonly LinkedList<int> list;     // The linked list to navigate.
+        private INodeNavigationListener? _listener = null; // The listener to notify when a node is visited.
 
         /// <summary>
         /// Creates an instance of the node navigator.
@@ -26,10 +26,10 @@ namespace ObserverPatternDemo
         /// <param name="numbers">The list of numbers to initialize the navigator with.</param>
         public NodeNavigator(int[] numbers)
         {
-            _list = new LinkedList<int>();
+            list = new LinkedList<int>();
             foreach (int n in numbers)
             {
-                _list.AddLast(n);
+                list.AddLast(n);
             }
         }
 
@@ -47,7 +47,7 @@ namespace ObserverPatternDemo
         /// </summary>
         public void Navigate()
         {
-            LinkedListNode<int>? node = _list.First;
+            LinkedListNode<int>? node = list.First;
             while (node != null)
             {
                 // Notify the listener when a node is visited.
