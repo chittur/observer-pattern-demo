@@ -49,20 +49,19 @@ steps:
     projects: '**/*Tests/*.csproj'
     arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Install ReportGenerator'
-  inputs:
-    command: 'tool'
-    custom: 'install'
-    arguments: 'reportgenerator --global'
+- powershell: |
+    Invoke-WebRequest -Uri https://github.com/danielpalme/ReportGenerator/releases/download/v4.8.12/ReportGenerator.zip -OutFile ReportGenerator.zip
+    Expand-Archive -Path ReportGenerator.zip -DestinationPath $(Build.SourcesDirectory)/reportgenerator
+  displayName: 'Download and Extract ReportGenerator'
 
 - powershell: |
-    reportgenerator -reports:$(Build.SourcesDirectory)/TestResults/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Html
+    $(Build.SourcesDirectory)/reportgenerator/ReportGenerator.exe -reports:$(Build.SourcesDirectory)/TestResults/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Html
   displayName: 'Generate Code Coverage Report'
 
 - powershell: |
-    $coverage = (Get-Content $(Build.SourcesDirectory)/CodeCoverage/Summary.xml) -match '<coverage line-rate="(\d+\.\d+)"'
-    $coverageValue = [math]::Round(($matches[1] -replace '%',''))
+    [xml]$summary = Get-Content $(Build.SourcesDirectory)/CodeCoverage/Summary.xml
+    $coverage = $summary.coverage.line-rate
+    $coverageValue = [math]::Round(($coverage -replace '%',''))
     if ($coverageValue -lt $(coverageThreshold)) {
       Write-Host "##vso[task.logissue type=warning]Code coverage ($coverageValue%) is below the threshold ($(coverageThreshold)%)"
     } else {
