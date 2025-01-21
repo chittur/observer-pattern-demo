@@ -28,6 +28,12 @@ steps:
     projects: '**/*.csproj'
     arguments: '--configuration $(buildConfiguration)'
 
+- script: |
+    if dotnet tool list -g | grep -q dotnet-format; then
+      dotnet tool uninstall -g dotnet-format
+    fi
+  displayName: 'Uninstall existing dotnet-format if installed'
+
 - task: DotNetCoreCLI@2
   displayName: 'Install dotnet-format'
   inputs:
@@ -41,7 +47,7 @@ steps:
     command: 'custom'
     custom: 'format'
     arguments: '--verify-no-changes'
-    workingDirectory: '$(Agent.ToolsDirectory)/.store/dotnet-format/*/dotnet-format/*/tools/net6.0/any/'
+    workingDirectory: '$(Agent.ToolsDirectory)/dotnet-tools/.store/dotnet-format/*/dotnet-format/*/tools/net6.0/any/'
   continueOnError: false # This will fail the pipeline if there are any formatting issues
 
 - task: DotNetCoreCLI@2
