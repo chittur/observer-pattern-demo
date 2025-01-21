@@ -6,6 +6,7 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
+  coverageThreshold: '80'
 
 steps:
 - task: UseDotNet@2
@@ -42,8 +43,29 @@ steps:
   continueOnError: false # This will fail the pipeline if there are any formatting issues
 
 - task: DotNetCoreCLI@2
-  displayName: 'Run Unit Tests'
+  displayName: 'Run Unit Tests with Coverage'
   inputs:
     command: 'test'
     projects: '**/*Tests/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --no-build'
+    arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Install ReportGenerator'
+  inputs:
+    command: 'tool'
+    custom: 'install'
+    arguments: 'reportgenerator --global'
+
+- powershell: |
+    reportgenerator -reports:$(Build.SourcesDirectory)/TestResults/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Html
+  displayName: 'Generate Code Coverage Report'
+
+- powershell: |
+    $coverage = (Get-Content $(Build.SourcesDirectory)/CodeCoverage/Summary.xml) -match '<coverage line-rate="(\d+\.\d+)"'
+    $coverageValue = [math]::Round(($matches[1] -replace '%',''))
+    if ($coverageValue -lt $(coverageThreshold)) {
+      Write-Host "##vso[task.logissue type=warning]Code coverage ($coverageValue%) is below the threshold ($(coverageThreshold)%)"
+    } else {
+      Write-Host "Code coverage ($coverageValue%) is above the threshold ($(coverageThreshold)%)"
+    }
+  displayName: 'Check Code Coverage Threshold'
