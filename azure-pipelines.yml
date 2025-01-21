@@ -35,15 +35,13 @@ steps:
     custom: 'tool'
     arguments: 'install -g dotnet-format'
 
-- script: echo '##vso[task.setvariable variable=PATH]$(PATH):$(AGENT_TOOLSDIRECTORY)/dotnet-tools'
-  displayName: 'Add dotnet-format to PATH'
-
 - task: DotNetCoreCLI@2
   displayName: 'Run .editorconfig checks'
   inputs:
     command: 'custom'
     custom: 'format'
     arguments: '--verify-no-changes'
+    workingDirectory: '$(Agent.ToolsDirectory)/.store/dotnet-format/*/dotnet-format/*/tools/net6.0/any/'
   continueOnError: false # This will fail the pipeline if there are any formatting issues
 
 - task: DotNetCoreCLI@2
