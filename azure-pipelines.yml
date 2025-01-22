@@ -99,11 +99,6 @@ steps:
     }
   displayName: 'Check Code Coverage Threshold'
 
-- powershell: |
-    Write-Host "Contents of CodeCoverage directory:"
-    Get-ChildItem -Path $(Build.SourcesDirectory)\\CodeCoverage -Recurse
-  displayName: 'Log CodeCoverage Directory Contents'
-
 - task: CopyFiles@2
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)\\CodeCoverage'
@@ -117,3 +112,10 @@ steps:
     artifactName: 'code-coverage-html'
     publishLocation: 'Container'
   displayName: 'Publish Code Coverage HTML Report'
+
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: '$(Build.SourcesDirectory)\\TestResults\\coverage\\coverage.cobertura.xml'
+    reportDirectory: '$(Build.SourcesDirectory)\\CodeCoverage'
+  displayName: 'Publish Code Coverage Results'
