@@ -80,7 +80,7 @@ steps:
     $htmlSummaryPath = "$(Build.SourcesDirectory)\\CodeCoverage\\index.html"
     if (Test-Path $htmlSummaryPath) {
       $summaryContent = Get-Content $htmlSummaryPath
-      $coveragePattern = '<span class="tooltip-name">Line coverage:</span>\s*<span class="tooltip-value">([0-9]+\.[0-9]+)%'
+      $coveragePattern = '<div class="large cardpercentagebar cardpercentagebar0">([0-9]+)%</div>'
       if ($summaryContent -match $coveragePattern) {
         $coverageValue = [math]::Round([double]$matches[1])
         if ($coverageValue -lt $(coverageThreshold)) {
