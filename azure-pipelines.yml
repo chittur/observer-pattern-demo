@@ -100,12 +100,17 @@ steps:
   displayName: 'Check Code Coverage Threshold'
 
 - powershell: |
-    Copy-Item -Path $(Build.SourcesDirectory)\\CodeCoverage\\index.html -Destination $(Build.ArtifactStagingDirectory) -Force
+    Write-Host "Contents of CodeCoverage directory:"
+    Get-ChildItem -Path $(Build.SourcesDirectory)\\CodeCoverage -Recurse
+  displayName: 'Log CodeCoverage Directory Contents'
+
+- powershell: |
+    Copy-Item -Path $(Build.SourcesDirectory)\\CodeCoverage\\* -Destination $(Build.ArtifactStagingDirectory)\\CodeCoverage -Recurse -Force
   displayName: 'Copy Code Coverage HTML to Staging Directory'
 
 - task: PublishBuildArtifacts@1
   inputs:
-    path: '$(Build.ArtifactStagingDirectory)\\index.html'
+    path: '$(Build.ArtifactStagingDirectory)\\CodeCoverage'
     artifactName: 'code-coverage-html'
     publishLocation: 'Container'
   displayName: 'Publish Code Coverage HTML Report'
