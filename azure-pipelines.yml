@@ -56,6 +56,10 @@ steps:
   continueOnError: false
 
 - powershell: |
+    Get-ChildItem -Path $(Build.SourcesDirectory)\\TestResults\\coverage -Recurse
+  displayName: 'Log Coverage Directory Contents'
+
+- powershell: |
     $reportGenerator = dotnet tool list -g | Select-String 'dotnet-reportgenerator-globaltool'
     if (-not $reportGenerator) {
       dotnet tool install --global dotnet-reportgenerator-globaltool
