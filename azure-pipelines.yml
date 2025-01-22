@@ -17,6 +17,10 @@ steps:
     version: '8.x'
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
+- script: |
+    dotnet add **/*Tests/*.csproj package coverlet.msbuild
+  displayName: 'Add Coverlet to Test Projects'
+
 - task: DotNetCoreCLI@2
   displayName: 'Restore NuGet Packages'
   inputs:
@@ -29,14 +33,6 @@ steps:
     command: 'build'
     projects: '**/*.sln'
     arguments: '--configuration $(buildConfiguration)'
-
-- powershell: |
-    $dotnetFormat = dotnet tool list -g | Select-String 'dotnet-format'
-    if (-not $dotnetFormat) {
-      dotnet tool install -g dotnet-format
-    }
-    $env:PATH += ';' + [System.Environment]::GetFolderPath('UserProfile') + '\\.dotnet\\tools'
-  displayName: 'Ensure dotnet-format is installed and add to PATH'
 
 - powershell: |
     dotnet format --verify-no-changes
@@ -56,6 +52,12 @@ steps:
   continueOnError: false
 
 - powershell: |
+    Write-Host "Checking if the coverage file exists..."
+    if (Test-Path $(coverageFilePath)) {
+      Write-Host "Coverage file found: $(coverageFilePath)"
+    } else {
+      Write-Host "Coverage file not found at: $(coverageFilePath)"
+    }
     Get-ChildItem -Path $(Build.SourcesDirectory)\\TestResults\\coverage -Recurse
   displayName: 'Log Coverage Directory Contents'
 
