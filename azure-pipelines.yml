@@ -50,9 +50,12 @@ steps:
     arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/coverage/'
 
 - powershell: |
-    dotnet tool install --global dotnet-reportgenerator-globaltool --version 4.8.12
+    $reportGenerator = dotnet tool list -g | Select-String 'dotnet-reportgenerator-globaltool'
+    if (-not $reportGenerator) {
+      dotnet tool install --global dotnet-reportgenerator-globaltool
+    }
     $env:PATH += ';' + [System.Environment]::GetFolderPath('UserProfile') + '\.dotnet\tools'
-  displayName: 'Install ReportGenerator as Global Tool (compatible version)'
+  displayName: 'Ensure ReportGenerator is installed and add to PATH'
 
 - powershell: |
     reportgenerator -reports:$(Build.SourcesDirectory)/TestResults/coverage/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Html
