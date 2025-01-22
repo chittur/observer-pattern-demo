@@ -81,8 +81,9 @@ steps:
     if (Test-Path $htmlSummaryPath) {
       $summaryContent = Get-Content $htmlSummaryPath
       $coveragePattern = '<div class="large cardpercentagebar cardpercentagebar0">([0-9]+)%</div>'
-      if ($summaryContent -match $coveragePattern) {
-        $coverageValue = [math]::Round([double]$matches[1])
+      $matches = [regex]::Matches($summaryContent, $coveragePattern)
+      if ($matches.Count -gt 0) {
+        $coverageValue = [math]::Round([double]$matches[0].Groups[1].Value)
         if ($coverageValue -lt $(coverageThreshold)) {
           Write-Host "##vso[task.logissue type=warning]Code coverage ($coverageValue%) is below the threshold ($(coverageThreshold)%)"
         } else {
