@@ -104,8 +104,11 @@ steps:
     Get-ChildItem -Path $(Build.SourcesDirectory)\\CodeCoverage -Recurse
   displayName: 'Log CodeCoverage Directory Contents'
 
-- powershell: |
-    Copy-Item -Path $(Build.SourcesDirectory)\\CodeCoverage\\* -Destination $(Build.ArtifactStagingDirectory)\\CodeCoverage -Recurse -Force
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)\\CodeCoverage'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\\CodeCoverage'
   displayName: 'Copy Code Coverage HTML to Staging Directory'
 
 - task: PublishBuildArtifacts@1
