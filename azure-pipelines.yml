@@ -58,7 +58,7 @@ steps:
   displayName: 'Ensure ReportGenerator is installed and add to PATH'
 
 - powershell: |
-    reportgenerator -reports:$(Build.SourcesDirectory)/TestResults/coverage/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Html
+    reportgenerator -reports:$(Build.SourcesDirectory)/TestResults/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Html
   displayName: 'Generate Code Coverage Report'
 
 - powershell: |
