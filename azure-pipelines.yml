@@ -31,6 +31,14 @@ steps:
     arguments: '--configuration $(buildConfiguration)'
 
 - powershell: |
+    $dotnetFormat = dotnet tool list -g | Select-String 'dotnet-format'
+    if (-not $dotnetFormat) {
+      dotnet tool install -g dotnet-format
+    }
+    $env:PATH += ';' + [System.Environment]::GetFolderPath('UserProfile') + '\.dotnet\tools'
+  displayName: 'Ensure dotnet-format is installed and add to PATH'
+
+- powershell: |
     dotnet format --verify-no-changes
   displayName: 'Run .editorconfig checks'
   continueOnError: false # This will fail the pipeline if there are any formatting issues
