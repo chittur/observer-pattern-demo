@@ -54,6 +54,7 @@ public class NodeNavigatorUnitTests
     /// Tests navigation callbacks.
     /// </summary>
     [TestMethod]
+    [Owner("Ramaswamy Krishnan-Chittur")]
     public void TestNavigationCallbacks()
     {
         Logger.LogMessage("Running TestNavigationCallbacks");
@@ -70,6 +71,7 @@ public class NodeNavigatorUnitTests
     /// Tests that there are no navigation callbacks when there are no nodes.
     /// </summary>
     [TestMethod]
+    [Owner("Ramaswamy Krishnan-Chittur")]
     public void TestEmptyNavigationHasNoCallback()
     {
         Logger.LogMessage("Running TestEmptyNavigationHasNoCallback");
