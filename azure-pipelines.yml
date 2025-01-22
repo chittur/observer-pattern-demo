@@ -50,14 +50,9 @@ steps:
     arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/'
 
 - powershell: |
-    Set-ExecutionPolicy Bypass -Scope Process -Force; 
-    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; 
-    iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-  displayName: 'Install Chocolatey'
-
-- powershell: |
-    choco install reportgenerator -y
-  displayName: 'Install ReportGenerator using Chocolatey'
+    dotnet tool install --global dotnet-reportgenerator-globaltool
+    $env:PATH += ';' + [System.Environment]::GetFolderPath('UserProfile') + '\.dotnet\tools'
+  displayName: 'Install ReportGenerator as Global Tool'
 
 - powershell: |
     reportgenerator -reports:$(Build.SourcesDirectory)/TestResults/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Html
