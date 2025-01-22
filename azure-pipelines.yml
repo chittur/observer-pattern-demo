@@ -47,20 +47,20 @@ steps:
   inputs:
     command: 'test'
     projects: '**/*Tests/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/'
+    arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/coverage/'
 
 - powershell: |
-    dotnet tool install --global dotnet-reportgenerator-globaltool
+    dotnet tool install --global dotnet-reportgenerator-globaltool --version 4.8.12
     $env:PATH += ';' + [System.Environment]::GetFolderPath('UserProfile') + '\.dotnet\tools'
-  displayName: 'Install ReportGenerator as Global Tool'
+  displayName: 'Install ReportGenerator as Global Tool (compatible version)'
 
 - powershell: |
-    reportgenerator -reports:$(Build.SourcesDirectory)/TestResults/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Html
+    reportgenerator -reports:$(Build.SourcesDirectory)/TestResults/coverage/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Html
   displayName: 'Generate Code Coverage Report'
 
 - powershell: |
     [xml]$summary = Get-Content $(Build.SourcesDirectory)/CodeCoverage/Summary.xml
-    $coverage = $summary.coverage.line-rate
+    $coverage = $summary.coverage.'line-rate'
     $coverageValue = [math]::Round(($coverage -replace '%',''))
     if ($coverageValue -lt $(coverageThreshold)) {
       Write-Host "##vso[task.logissue type=warning]Code coverage ($coverageValue%) is below the threshold ($(coverageThreshold)%)"
