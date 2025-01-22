@@ -98,3 +98,10 @@ steps:
       exit 1
     }
   displayName: 'Check Code Coverage Threshold'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    path: '$(Build.SourcesDirectory)\\CodeCoverage\\index.html'
+    artifactName: 'code-coverage-html'
+    publishLocation: 'Container'
+  displayName: 'Publish Code Coverage HTML Report'
