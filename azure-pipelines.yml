@@ -43,12 +43,17 @@ steps:
   displayName: 'Run .editorconfig checks'
   continueOnError: false # This will fail the pipeline if there are any formatting issues
 
+- powershell: |
+    New-Item -ItemType Directory -Force -Path $(Build.SourcesDirectory)\\TestResults\\coverage
+  displayName: 'Create Coverage Directory'
+
 - task: DotNetCoreCLI@2
   displayName: 'Run Unit Tests with Coverage'
   inputs:
     command: 'test'
     projects: '**/*Tests/*.csproj'
     arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(coverageFilePath)'
+  continueOnError: false
 
 - powershell: |
     $reportGenerator = dotnet tool list -g | Select-String 'dotnet-reportgenerator-globaltool'
