@@ -52,7 +52,7 @@ steps:
   inputs:
     command: 'test'
     projects: '**/*Tests/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(coverageFilePath)'
+    arguments: '--configuration $(buildConfiguration) --no-build --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Agent.TempDirectory)\\coverage.cobertura.xml'
   continueOnError: false
 
 - powershell: |
@@ -64,6 +64,10 @@ steps:
     }
     Get-ChildItem -Path $(Build.SourcesDirectory)\\TestResults\\coverage -Recurse
   displayName: 'Log Coverage Directory Contents'
+
+- powershell: |
+    Get-ChildItem -Path $(Agent.TempDirectory) -Filter 'coverage.cobertura.xml' -Recurse | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | ForEach-Object { Move-Item -Path $_.FullName -Destination '$(coverageFilePath)' }
+  displayName: 'Move Latest Coverage File'
 
 - powershell: |
     $reportGenerator = dotnet tool list -g | Select-String 'dotnet-reportgenerator-globaltool'
