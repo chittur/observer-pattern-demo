@@ -56,16 +56,6 @@ steps:
   continueOnError: false
 
 - powershell: |
-    Write-Host "Checking if the coverage file exists..."
-    if (Test-Path $(coverageFilePath)) {
-      Write-Host "Coverage file found: $(coverageFilePath)"
-    } else {
-      Write-Host "Coverage file not found at: $(coverageFilePath)"
-    }
-    Get-ChildItem -Path $(Build.SourcesDirectory)\\TestResults\\coverage -Recurse
-  displayName: 'Log Coverage Directory Contents'
-
-- powershell: |
     Get-ChildItem -Path $(Agent.TempDirectory) -Filter 'coverage.cobertura.xml' -Recurse | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | ForEach-Object { Move-Item -Path $_.FullName -Destination '$(coverageFilePath)' }
   displayName: 'Move Latest Coverage File'
 
@@ -87,12 +77,23 @@ steps:
   displayName: 'Generate Code Coverage Report'
 
 - powershell: |
-    [xml]$summary = Get-Content $(Build.SourcesDirectory)\\CodeCoverage\\Summary.xml
-    $coverage = $summary.coverage.'line-rate'
-    $coverageValue = [math]::Round(($coverage -replace '%',''))
-    if ($coverageValue -lt $(coverageThreshold)) {
-      Write-Host "##vso[task.logissue type=warning]Code coverage ($coverageValue%) is below the threshold ($(coverageThreshold)%)"
+    $htmlSummaryPath = "$(Build.SourcesDirectory)\\CodeCoverage\\index.htm"
+    if (Test-Path $htmlSummaryPath) {
+      $summaryContent = Get-Content $htmlSummaryPath
+      $coveragePattern = "class='fraction'>([0-9]+\.[0-9]+)%<"
+      if ($summaryContent -match $coveragePattern) {
+        $coverageValue = [math]::Round([double]$matches[1])
+        if ($coverageValue -lt $(coverageThreshold)) {
+          Write-Host "##vso[task.logissue type=warning]Code coverage ($coverageValue%) is below the threshold ($(coverageThreshold)%)"
+        } else {
+          Write-Host "Code coverage ($coverageValue%) is above the threshold ($(coverageThreshold)%)"
+        }
+      } else {
+        Write-Host "##vso[task.logissue type=error]Could not find coverage percentage in the HTML summary."
+        exit 1
+      }
     } else {
-      Write-Host "Code coverage ($coverageValue%) is above the threshold ($(coverageThreshold)%)"
+      Write-Host "##vso[task.logissue type=error]HTML summary not found: $htmlSummaryPath"
+      exit 1
     }
   displayName: 'Check Code Coverage Threshold'
