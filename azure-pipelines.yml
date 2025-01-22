@@ -17,10 +17,6 @@ steps:
     version: '8.x'
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
-- script: |
-    dotnet add **/*Tests/*.csproj package coverlet.msbuild
-  displayName: 'Add Coverlet to Test Projects'
-
 - task: DotNetCoreCLI@2
   displayName: 'Restore NuGet Packages'
   inputs:
