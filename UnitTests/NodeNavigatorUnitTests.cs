@@ -55,6 +55,7 @@ public class NodeNavigatorUnitTests
     /// </summary>
     [TestMethod]
     [Owner("Ramaswamy Krishnan-Chittur")]
+    [Priority(1)]
     public void TestNavigationCallbacks()
     {
         Logger.LogMessage("Running TestNavigationCallbacks");
@@ -72,6 +73,7 @@ public class NodeNavigatorUnitTests
     /// </summary>
     [TestMethod]
     [Owner("Ramaswamy Krishnan-Chittur")]
+    [Priority(1)]
     public void TestEmptyNavigationHasNoCallback()
     {
         Logger.LogMessage("Running TestEmptyNavigationHasNoCallback");
