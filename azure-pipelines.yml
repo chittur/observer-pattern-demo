@@ -7,6 +7,7 @@ pool:
 variables:
   buildConfiguration: 'Release'
   coverageThreshold: '80'
+  coverageFilePath: '$(Build.SourcesDirectory)/TestResults/coverage/coverage.cobertura.xml'
 
 steps:
 - task: UseDotNet@2
@@ -47,7 +48,7 @@ steps:
   inputs:
     command: 'test'
     projects: '**/*Tests/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/coverage/'
+    arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(coverageFilePath)'
 
 - powershell: |
     $reportGenerator = dotnet tool list -g | Select-String 'dotnet-reportgenerator-globaltool'
@@ -58,7 +59,12 @@ steps:
   displayName: 'Ensure ReportGenerator is installed and add to PATH'
 
 - powershell: |
-    reportgenerator -reports:$(Build.SourcesDirectory)/TestResults/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Html
+    if (Test-Path $(coverageFilePath)) {
+      reportgenerator -reports:$(coverageFilePath) -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Html
+    } else {
+      Write-Host "##vso[task.logissue type=error]Coverage file not found: $(coverageFilePath)"
+      exit 1
+    }
   displayName: 'Generate Code Coverage Report'
 
 - powershell: |
